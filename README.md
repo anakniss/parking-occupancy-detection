@@ -20,7 +20,7 @@ A utilização de técnicas clássicas, possivelmente mais leves que técnicas d
 
 # Objetivo geral
 
-Desenvolver uma solução baseada em técnicas de Processamento Digital de Imagens capaz de identificar se uma vaga de estacionamento está ocupada ou disponível a partir de imagens.
+Desenvolver uma abordagem computacional com técnicas clássicas de Processamento Digital de Imagens para identificar automaticamente a ocupação de vagas de estacionamento a partir de imagens obtidas por câmeras fixas.
 
 # Visão resumida da solução proposta
 
