@@ -73,7 +73,7 @@ Desenvolver uma abordagem computacional com técnicas clássicas de Processament
 ### Objetivos Específicos
 
 - Selecionar e organizar um conjunto inicial de imagens.
-- Investigar técnicas clássicas de processamento de imagens que possam ser utilizadas no pré-processamentoe na comparação entre as imagens.
+- Investigar técnicas clássicas de processamento de imagens que possam ser utilizadas no pré-processamento e na comparação entre as imagens.
 - Desenvolver uma estratégia de classificação das regiões analisadas em vagas livres e ocupadas.
 - Avaliar a viabilidade da proposta por meio de experimentos com diferentes imagens do conjunto selecionado.
 - Determinar, a partir da classificação das vagas, informações sobre a ocupação do estacionamento, como quantidade de vagas livres, quantidade de vagas ocupadas e percentual de ocupação.
