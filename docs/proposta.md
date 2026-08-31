@@ -68,14 +68,15 @@ Posteriormente, o projeto poderá ser ampliado para avaliar o compotamento da ab
 
 ### Objetivo Geral
 
-Desenvolver uma abordagem computacional com técnicas clássicas de Processamento de Imagens Digitais para identificar automaticamente a ocupação de vagas de estacionamento a partir de imagens obtidas por câmeras fixas.
+Desenvolver uma abordagem computacional com técnicas clássicas de Processamento Digital de Imagens para identificar automaticamente a ocupação de vagas de estacionamento a partir de imagens obtidas por câmeras fixas.
 
 ### Objetivos Específicos
 
 - Selecionar e organizar um conjunto inicial de imagens.
-- Investigar técnicas clássicas de processamento de imagens que possam ser utilizadas no pré-processamentoe na comparação entre as imagens.
+- Investigar técnicas clássicas de processamento de imagens que possam ser utilizadas no pré-processamento para padronizar as imagens antes da análise.
+- Investigar técnicas para identificação do estado de ocupação de cada vaga para determinar se está livre ou ocupada.
 - Desenvolver uma estratégia de classificação das regiões analisadas em vagas livres e ocupadas.
-- Avaliar a viabilidade da proposta por meio de experimentos com diferentes imagens do conjunto selecionado.
+- Avaliar o desempenho da abordagem desenvolvida por meio de métricas quantitativas, comparando as classificações obtidas com os rótulos reais fornecidos pelo dataset.
 - Determinar, a partir da classificação das vagas, informações sobre a ocupação do estacionamento, como quantidade de vagas livres, quantidade de vagas ocupadas e percentual de ocupação.
 
 ## Entrada e saída esperadas
