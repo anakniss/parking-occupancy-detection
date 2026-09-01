@@ -68,7 +68,7 @@ Não tem...
 
 # Link para o vídeo da M1
 
-https://youtube.com ...
+[https://youtube.com ...](https://youtu.be/s6ykhlP6b3k)
 
 # Link para documentação adicional existente no próprio repositório
 
