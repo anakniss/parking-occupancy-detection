@@ -113,9 +113,9 @@ flowchart TD
 
 ### Pré-processamento
 - Finalidade: Preparar, normalizar e padronizar as imagens para facilitar etapas seguintes;
-- Técnicas consideradas: ??;
+- Técnicas consideradas: Conversão para escala de cinza, ajuste de contraste, filtragem e redução de ruído;
 - Informação recebida: Imagens de estacionamento a serem pré-processadas;
-- Informação produzida: Imagens pré-processadas?;
+- Informação produzida: Imagens pré-processadas;
 - Principais dúvidas: Quais técnicas de pré-processamento seram as mais adequadas.
 
 ### Separação das vagas
