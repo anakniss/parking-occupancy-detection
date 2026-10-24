@@ -42,10 +42,46 @@ O dataset é público e foi encontrado a partir do seguinte artigo:
 
 Almeida, P., Oliveira, L. S., Silva Jr, E., Britto Jr, A., Koerich, A., PKLot – A robust dataset for parking lot classification, Expert Systems with Applications, 42(11):4937-4949, 2015.
 
+## Acesso ao dataset para reprodução
+
+O conjunto completo do PKLot não é versionado neste repositório. Para obtê-lo, use a versão pública disponibilizada no [Hugging Face](https://huggingface.co/datasets/Voxel51/PKLot). O repositório contém uma amostra em `images/input/`; ela pode ser usada para conferir a estrutura local sem baixar o conjunto completo.
+
+Uma forma de baixar e carregar os dados e suas anotações é usar o FiftyOne:
+
+```bash
+python -m pip install -U fiftyone "huggingface-hub>=0.20.0"
+```
+
+Em seguida, execute este código Python na máquina em que os experimentos serão reproduzidos:
+
+```python
+import fiftyone as fo
+from fiftyone.utils.huggingface import load_from_hub
+
+# Load the dataset
+# Note: other available arguments include 'max_samples', etc
+dataset = load_from_hub("Voxel51/PKLot")
+
+# Launch the App
+session = fo.launch_app(dataset)
+session.wait()
+```
+
+O comando instala o FiftyOne. O código carrega o dataset PKLot pela plataforma Hugging Face e abre o FiftyOne App, onde é possível explorar as imagens e suas anotações. O objeto `dataset` também fica disponível no Python para uso nos experimentos. Consulte a página do dataset para obter detalhes sobre os campos e as anotações.
 
 # Estágio atual do projeto
 
-O projeto está na fase de concepção e validação da relevância da problemática, assim como da viabilidade das soluções propostas.
+O projeto está em evolução para a etapa M2, com foco em uma implementação parcial executável e em validação experimental de técnicas clássicas de processamento de imagens para ocupação de vagas.
+
+# Resposta ao feedback da M1 e evolução para a M2
+
+A proposta original foi mantida em sua ideia central: analisar vagas conhecidas em câmeras fixas por comparação entre uma imagem atual e uma imagem de referência. Os principais ajustes foram:
+
+1. Escopo focado: a etapa de detecção automática de vagas foi retirada da prioridade da M2. Em vez disso, a análise será aplicada sobre regiões previamente conhecidas, usando coordenadas ou metadados do conjunto de dados. Essa decisão reduz ambiguidades e permite avaliar a classificação da ocupação com maior controle experimental.
+2. Reprodutibilidade e controle de dados: o conjunto completo do PKLot não será versionado no repositório. A proposta passa a manter uma amostra representativa e instruções de acesso ao dataset para reprodução.
+3. Avaliação comparativa: o projeto agora prevê pelo menos duas configurações controladas, com variação explícita de parâmetros ou de técnica (por exemplo, diferença absoluta com e sem morfologia, ou limiar global e limiar adaptativo), de modo a medir quantitativamente a qualidade da resposta.
+
+Essas mudanças estão alinhadas aos pontos levantados no feedback da M1, especialmente no que diz respeito a escopo, documentação e reprodução do experimento.
 
 # Organização do repositório
 
