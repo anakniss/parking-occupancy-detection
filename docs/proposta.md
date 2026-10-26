@@ -3,7 +3,7 @@
 ## Problema
 Esse  projeto investiga a identificação automática de vagas livres e ocupadas em estacionamentos a partir de imagens obtidas por câmeras fixas, utilizando técnicas clássicas de Processamento Digital de Imagens.
 
-A situação inicial considerada é a existência de imagens de um mesmo estacionamento capturadas ao longo do temo, com enquadramento fixo e com as regiões correxspondentes às vagas previamente conhecidas. A partir dessas imagens, pretende-se analisar individualmente cada vaga e determinar se ela se encontra livre ou ocupada.
+A situação inicial considerada é a existência de imagens de um mesmo estacionamento capturadas ao longo do temo, com enquadramento fixo e com as regiões correspondentes às vagas previamente conhecidas. A partir dessas imagens, pretende-se analisar individualmente cada vaga e determinar se ela se encontra livre ou ocupada.
 
 O problema envolve diretamente processamento e análise de imagens, pois a decisão sobre o estado da vaga será obtida a partir da comparação visual entre uma imagem atual e uma imagem de referência da mesma região em estado livre.
 
@@ -18,7 +18,7 @@ Entre os fatores que podem dificultar essa comparação estão:
 
 A proposta inicial consiste em investigar se técnicas como pré-processamento, diferenteças absolutas entre imagens, limiarização e operações morfológicas são suficientes para identificar alterações significativas nas regiões correspondentes às vagas.
 
-A principal questão investiga pelo projeto é:
+A principal questão investigada pelo projeto é:
 
 Como identificar vagas livres e ocupadas em imagens de estacionamentos utilizandos técnicas clássicas de Processamento Digital de Imagens baseadas na comparação entre imagens, considerando variações de iluminação, sombras e condições ambientais?
 
@@ -63,6 +63,40 @@ O conjunto possui imagens de estacionamentos capturas por câmeras fixas e apres
 Inicialmente, será selecionado um subconjunto de imagens provenientes do mesmo estacionamento e da mesma câmera, de forma a manter o enquadramento constante e facilitar os experimentos de comparação entre imagens.
 
 Posteriormente, o projeto poderá ser ampliado para avaliar o compotamento da abordagem diante de diferentes condições climáticas e de iluminação.
+
+## Evolução da proposta e resposta ao feedback da M1
+
+A proposta do projeto foi mantida no que é central ao problema: câmeras fixas, vagas previamente conhecidas e análise por comparação entre imagens em estado livre e ocupado.
+
+### O que foi mantido
+- Uso de câmeras fixas e regiões de vaga previamente conhecidas, como sugerido na proposta original.
+- Abordagem baseada na comparação da imagem atual com uma imagem de referência da mesma vaga em estado livre.
+- Uso de técnicas clássicas de PDI, como diferença absoluta entre imagens, limiarização e operações morfológicas.
+- Objetivo de produzir classificação por vaga e estimar o nível de ocupação do estacionamento.
+
+### O que foi corrigido
+- Escopo ajustado: na M2, a identificação automática das vagas não será tratada como etapa principal. A detecção das áreas de vaga será feita por coordenadas/XML do conjunto de dados e pelo uso das vagas já conhecidas, preservando a consistência do problema e evitando sobrecarga de processamento.
+- Dataset: em vez de versionar o conjunto completo do PKLot no repositório, será utilizado um subconjunto pequeno e instruções de obtenção para reprodução.
+- Documentação e execução: o README e a documentação do projeto passarão a registrar comandos, dependências e critérios de avaliação de forma mais clara.
+
+### Resposta técnica ao feedback da M1
+1. Sobre o versionamento do dataset: o projeto manterá uma amostra representativa para implementação e experimentação, sem armazenar o conjunto completo do PKLot no repositório. A origem do estudo e o procedimento de download serão documentados para permitir reprodução sem dependência de artefatos pesados no histórico Git.
+2. Sobre o escopo da detecção de vagas: a decisão foi limitar a M2 ao uso de coordenadas de vagas já conhecidas. Essa escolha é técnica e adequada porque a etapa de segmentação automática de vagas exige outra camada de modelagem e pode introduzir ruído e variabilidade que não é necessária para verificar a proposta principal de classificação da ocupação.
+3. Sobre a imagem de referência e variação ambiental: a análise será feita com referência da mesma câmera e da mesma região, escolhida em momento estável de baixa ocupação, com testes controlados para verificar sensibilidade a iluminação, sombra e clima. Isso reduz o efeito de ruído temporal e permite avaliar em que condições a diferença absoluta é robusta.
+4. Sobre baseline e avaliação: a M2 incluirá pelo menos duas configurações comparáveis, como diferença absoluta com e sem operações morfológicas, ou com limiar global versus limiar adaptativo. A comparação será feita em termos quantitativos de taxa de acerto e contagem de falsos positivos.
+5. Sobre documentação e execução: o repositório passará a explicitar preparação do ambiente, dependências, scripts e instruções de execução para que a etapa seja reproduzível.
+
+### Objetivos e critérios de sucesso para a M2
+- Implementar um pipeline parcial executável para análise de ocupação em vagas conhecidas.
+- Validar a comparação entre imagem atual e referência, com pré-processamento e morfologia adequados.
+- Comparar pelo menos duas configurações controladas a fim de identificar a mais robusta.
+- Produzir resultados numéricos e imagens intermediárias (diferença absoluta, limiarização, máscaras, componentes rotulados ou regiões isoladas).
+- Identificar limitações concretas, como sombras, reflexos e variação de iluminação, e definir o plano para a M3.
+
+### Rastreabilidade das mudanças
+- A revisão da proposta e do escopo está documentada neste arquivo, em conjunto com a resposta ao feedback da M1.
+- A implementação experimental e os resultados serão registrados em scripts e documentação de experimentos dentro do repositório, mantendo a relação entre decisão técnica, execução e evidência.
+- O README será atualizado para refletir o problema, os objetivos e as mudanças de escopo observadas na M1.
 
 ## Objetivo
 
