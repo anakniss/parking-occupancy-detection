@@ -1,0 +1,22 @@
+{
+  "image": "2013-04-14_10_00_04",
+  "condition": "Cloudy",
+  "reference": "2013-04-14_06_40_00",
+  "config": "B_morfologia",
+  "parameters": {
+    "blur_ksize": 5,
+    "gain_compensation": false,
+    "diff_threshold": 25,
+    "open_ksize": 3,
+    "close_ksize": 7,
+    "min_component_area": 15,
+    "occupancy_threshold": 0.24
+  },
+  "gain": 1.0,
+  "spaces": 40,
+  "occupied": 12,
+  "free": 28,
+  "occupancy_rate": 0.3,
+  "labeled_occupied": 12,
+  "correct": 40
+}
