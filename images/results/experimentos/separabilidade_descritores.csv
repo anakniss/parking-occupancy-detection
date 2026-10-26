@@ -1,0 +1,8 @@
+descriptor,description,auc_ajuste,auc_teste
+largest_frac,fração da vaga no maior componente (adim.),1.0,0.9997
+frac_changed,fração da vaga marcada como alterada (adim.),1.0,0.9997
+mean_diff,média da diferença absoluta na vaga (níveis de cinza),0.9994,0.9995
+n_components,nº de componentes >= área mínima,0.7872,0.8738
+largest_solidity,solidez do maior componente (adim.),0.8623,0.9188
+edge_density,densidade de bordas de Canny no quadro atual (adim.),0.9305,0.8575
+gray_std,desvio padrão do cinza no quadro atual (níveis de cinza),0.9867,0.9601
