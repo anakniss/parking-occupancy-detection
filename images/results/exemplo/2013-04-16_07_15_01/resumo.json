@@ -1,0 +1,22 @@
+{
+  "image": "2013-04-16_07_15_01",
+  "condition": "Sunny",
+  "reference": "2013-04-16_06_50_01",
+  "config": "B_morfologia",
+  "parameters": {
+    "blur_ksize": 5,
+    "gain_compensation": false,
+    "diff_threshold": 25,
+    "open_ksize": 3,
+    "close_ksize": 7,
+    "min_component_area": 15,
+    "occupancy_threshold": 0.24
+  },
+  "gain": 1.0,
+  "spaces": 40,
+  "occupied": 22,
+  "free": 18,
+  "occupancy_rate": 0.55,
+  "labeled_occupied": 23,
+  "correct": 39
+}
