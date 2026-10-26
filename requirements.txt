@@ -1,0 +1,6 @@
+# Testado com Python 3.14.8 (Windows 11) e as versões fixadas abaixo.
+# Versões anteriores compatíveis (OpenCV >= 4.8, NumPy >= 1.26, Matplotlib >= 3.8)
+# devem funcionar, mas os resultados do relatório foram gerados com estas.
+numpy==2.5.4
+opencv-python==5.0.0.93
+matplotlib==3.11.2

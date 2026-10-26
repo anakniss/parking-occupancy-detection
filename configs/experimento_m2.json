@@ -1,0 +1,62 @@
+{
+  "dataset_root": "images/input/UFPR05",
+  "results_dir": "images/results/experimentos",
+  "references": {
+    "2013-04-13": "images/input/UFPR05/Rainy/2013-04-13/2013-04-13_06_45_01.jpg",
+    "2013-04-14": "images/input/UFPR05/Cloudy/2013-04-14/2013-04-14_06_40_00.jpg",
+    "2013-04-16": "images/input/UFPR05/Sunny/2013-14-16/2013-04-16_06_50_01.jpg"
+  },
+  "tuning_dates": ["2013-04-14"],
+  "test_dates": ["2013-04-16", "2013-04-13"],
+  "search": {
+    "diff_threshold": [10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60],
+    "occupancy_threshold": {"start": 0.01, "stop": 0.99, "step": 0.01}
+  },
+  "default_config": "B_morfologia",
+  "configs": {
+    "A_sem_morfologia": {
+      "description": "Diferença absoluta + limiar global; sem morfologia",
+      "blur_ksize": 5,
+      "gain_compensation": false,
+      "open_ksize": 0,
+      "close_ksize": 0,
+      "min_component_area": 15,
+      "diff_threshold": 20,
+      "occupancy_threshold": 0.24
+    },
+    "B_morfologia": {
+      "description": "A + abertura (disco 3 px) e fechamento (disco 7 px)",
+      "blur_ksize": 5,
+      "gain_compensation": false,
+      "open_ksize": 3,
+      "close_ksize": 7,
+      "min_component_area": 15,
+      "diff_threshold": 25,
+      "occupancy_threshold": 0.24
+    },
+    "C_morfologia_ganho": {
+      "description": "B + compensação global de ganho (mediana da referência / mediana do quadro)",
+      "blur_ksize": 5,
+      "gain_compensation": true,
+      "open_ksize": 3,
+      "close_ksize": 7,
+      "min_component_area": 15,
+      "diff_threshold": 25,
+      "occupancy_threshold": 0.24
+    }
+  },
+  "comparisons": [
+    {
+      "id": "E1",
+      "question": "A abertura e o fechamento removem ruído da máscara sem perder veículos?",
+      "baseline": "A_sem_morfologia",
+      "variant": "B_morfologia"
+    },
+    {
+      "id": "E2",
+      "question": "A compensação global de ganho reduz os falsos positivos causados pela mudança de iluminação entre a referência e o quadro atual?",
+      "baseline": "B_morfologia",
+      "variant": "C_morfologia_ganho"
+    }
+  ]
+}

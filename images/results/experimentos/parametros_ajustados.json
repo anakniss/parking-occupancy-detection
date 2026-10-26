@@ -1,0 +1,29 @@
+{
+  "A_sem_morfologia": {
+    "blur_ksize": 5,
+    "gain_compensation": false,
+    "diff_threshold": 20,
+    "open_ksize": 0,
+    "close_ksize": 0,
+    "min_component_area": 15,
+    "occupancy_threshold": 0.24
+  },
+  "B_morfologia": {
+    "blur_ksize": 5,
+    "gain_compensation": false,
+    "diff_threshold": 25,
+    "open_ksize": 3,
+    "close_ksize": 7,
+    "min_component_area": 15,
+    "occupancy_threshold": 0.24
+  },
+  "C_morfologia_ganho": {
+    "blur_ksize": 5,
+    "gain_compensation": true,
+    "diff_threshold": 25,
+    "open_ksize": 3,
+    "close_ksize": 7,
+    "min_component_area": 15,
+    "occupancy_threshold": 0.24
+  }
+}
