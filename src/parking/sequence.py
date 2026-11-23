@@ -72,7 +72,9 @@ class DayProcessor:
 
     def adaptive_reference(self) -> Reference:
         gray = np.clip(self.adaptive + 0.5, 0, 255).astype(np.uint8)
-        return Reference(gray=gray, median=float(np.median(gray)), regions=self.fixed.regions)
+        # a mediana só é usada pela compensação global de ganho (config. C da M2)
+        median = float(np.median(gray)) if self.cfg.gain_compensation else self.fixed.median
+        return Reference(gray=gray, median=median, regions=self.fixed.regions)
 
     def describe(self, gray: np.ndarray, keep_steps: bool = False,
                  fixed_result: FrameAnalysis | None = None) -> tuple[list[dict], dict]:

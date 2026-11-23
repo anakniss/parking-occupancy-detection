@@ -19,8 +19,10 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 from collections import defaultdict
+from concurrent.futures import ProcessPoolExecutor
 from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
@@ -159,6 +161,25 @@ def run_sequences(data: Dataset, split: str, specs: dict[str, Spec], compact: bo
     return out
 
 
+def _worker(job: tuple) -> dict[str, list]:
+    experiment, split, specs, compact = job
+    return run_sequences(Dataset(experiment), split, specs, compact=compact)
+
+
+def run_parallel(experiment: dict, split: str, specs: dict[str, Spec], compact: bool, workers: int) -> dict[str, list]:
+    """Divide os specs entre processos (cada um lê as imagens por conta própria)."""
+    names = list(specs)
+    workers = max(1, min(workers, len(names)))
+    if workers == 1:
+        return run_sequences(Dataset(experiment), split, specs, compact=compact)
+    jobs = [(experiment, split, {n: specs[n] for n in names[i::workers]}, compact) for i in range(workers)]
+    out: dict[str, list] = {}
+    with ProcessPoolExecutor(workers) as pool:
+        for part in pool.map(_worker, jobs):
+            out.update(part)
+    return {n: out[n] for n in names}
+
+
 # ------------------------------------------------------------------ ajuste
 
 
@@ -286,7 +307,7 @@ def crop(img: np.ndarray, region, box) -> np.ndarray:
 # ------------------------------------------------------------------ etapa 1: desenvolvimento
 
 
-def stage_development(experiment: dict, data: Dataset, out_dir: Path) -> None:
+def stage_development(experiment: dict, data: Dataset, out_dir: Path, workers: int) -> None:
     cfg = PipelineConfig.from_dict(experiment["pipeline"])
     taus = taus_from(experiment["busca"]["tau"])
     days = data.days("desenvolvimento")
@@ -294,8 +315,8 @@ def stage_development(experiment: dict, data: Dataset, out_dir: Path) -> None:
 
     # 1) Busca em grade: todas as combinações em uma única passada pelos quadros.
     grid = grid_specs(experiment, cfg)
-    print(f"Desenvolvimento: {len(grid)} combinações em {len(days)} dias ...", flush=True)
-    compact = run_sequences(data, "desenvolvimento", {k: spec for k, (_, spec, _) in grid.items()}, compact=True)
+    print(f"Desenvolvimento: {len(grid)} combinações em {len(days)} dias ({workers} processos) ...", flush=True)
+    compact = run_parallel(experiment, "desenvolvimento", {k: spec for k, (_, spec, _) in grid.items()}, True, workers)
 
     grid_rows, best = [], {}
     per_variant = defaultdict(list)
@@ -330,8 +351,10 @@ def stage_development(experiment: dict, data: Dataset, out_dir: Path) -> None:
     snap_day = "2013-04-14"
     snap_ids = [f.id for f in data.day_frames("desenvolvimento", snap_day)
                 if f.time[:5] in ("12:00", "16:45", "17:00")]
+    full = run_parallel(experiment, "desenvolvimento", {k: grid[k][1] for k in needed}, False, workers)
     snapshots = {fid: best["dupla"]["key"] for fid in snap_ids}
-    full = run_sequences(data, "desenvolvimento", {k: grid[k][1] for k in needed}, snapshots=snapshots)
+    run_sequences(data, "desenvolvimento", {best["dupla"]["key"]: grid[best["dupla"]["key"]][1]}, compact=True,
+                  snapshots=snapshots)
 
     # 4) Regressão logística sobre os descritores da variante base, com a mesma validação cruzada.
     clf = experiment["classificador"]
@@ -471,7 +494,7 @@ def frozen_specs(frozen: dict) -> dict[str, tuple[Spec, float]]:
     return {name: ((cfg, SequenceConfig.from_dict(v)), v["tau"]) for name, v in frozen["variantes"].items()}
 
 
-def stage_test(experiment: dict, data: Dataset, out_dir: Path) -> None:
+def stage_test(experiment: dict, data: Dataset, out_dir: Path, workers: int) -> None:
     frozen = load_frozen()
     m2 = load_experiment(experiment["m2"]["experimento"])
     clf = frozen["classificador"]
@@ -494,7 +517,7 @@ def stage_test(experiment: dict, data: Dataset, out_dir: Path) -> None:
 
     days = data.days("teste")
     print(f"Teste: {len(specs)} configurações em {len(days)} dias inéditos ({', '.join(days)}) ...", flush=True)
-    rows = run_sequences(data, "teste", specs)
+    rows = run_parallel(experiment, "teste", specs, False, workers)
 
     # Todas as configurações percorrem as mesmas vagas-quadro, na mesma ordem.
     order = [(r["frame_id"], r["space_id"]) for r in rows[BASELINE]]
@@ -705,6 +728,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Avaliação final da M3 (desenvolvimento e teste).")
     parser.add_argument("--etapa", choices=["desenvolvimento", "teste"], required=True)
     parser.add_argument("--experiment", default=str(DEFAULT_EXPERIMENT), help="arquivo JSON do experimento")
+    parser.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) - 1),
+                        help="processos em paralelo na busca em grade e no teste (resultado não depende disso)")
     args = parser.parse_args()
 
     experiment = load_experiment(args.experiment)
@@ -712,9 +737,9 @@ def main() -> None:
     out_dir = resolve(experiment["results_dir"]) / args.etapa
     out_dir.mkdir(parents=True, exist_ok=True)
     if args.etapa == "desenvolvimento":
-        stage_development(experiment, data, out_dir)
+        stage_development(experiment, data, out_dir, args.workers)
     else:
-        stage_test(experiment, data, out_dir)
+        stage_test(experiment, data, out_dir, args.workers)
 
 
 if __name__ == "__main__":
