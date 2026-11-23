@@ -1,0 +1,112 @@
+{
+  "gerado_em": "2026-11-23T18:07:35",
+  "commit_do_codigo": "9a56cdfb9d854cacda78b47482e4fb3301e457fd",
+  "dias_de_desenvolvimento": [
+    "2013-04-13",
+    "2013-04-14",
+    "2013-04-16"
+  ],
+  "pipeline": {
+    "blur_ksize": 5,
+    "gain_compensation": false,
+    "diff_threshold": 25,
+    "open_ksize": 3,
+    "close_ksize": 7,
+    "min_component_area": 15,
+    "occupancy_threshold": 0.25
+  },
+  "variantes": {
+    "fixa": {
+      "descricao": "Só a referência fixa do início do dia (pipeline B da M2), tau reajustado no desenvolvimento",
+      "use_fixed": true,
+      "use_adaptive": false,
+      "alpha": 0.25,
+      "free_max": 0.2,
+      "tau": 0.43,
+      "f1_desenvolvimento": 0.9324894514767933,
+      "faixa_tau": [
+        0.43,
+        0.43
+      ]
+    },
+    "adaptativa": {
+      "descricao": "Só a referência adaptativa (média móvel seletiva nas vagas livres)",
+      "use_fixed": false,
+      "use_adaptive": true,
+      "alpha": 0.1,
+      "free_max": 0.25,
+      "tau": 0.29,
+      "f1_desenvolvimento": 0.9860243829913767,
+      "faixa_tau": [
+        0.29,
+        0.29
+      ]
+    },
+    "dupla": {
+      "descricao": "Referência fixa + adaptativa; ocupada se diferir das duas (menor fração >= tau)",
+      "use_fixed": true,
+      "use_adaptive": true,
+      "alpha": 0.25,
+      "free_max": 0.2,
+      "tau": 0.24,
+      "f1_desenvolvimento": 0.9916317991631799,
+      "faixa_tau": [
+        0.24,
+        0.24
+      ]
+    }
+  },
+  "classificador": {
+    "nome": "dupla_LR",
+    "descricao": "Referências da variante dupla; decisão por regressão logística sobre 7 descritores",
+    "base": "dupla",
+    "modelo": "regressão logística L2 (IRLS), descritores padronizados",
+    "features": [
+      "largest_frac_fix",
+      "largest_frac_ad",
+      "mean_diff_fix",
+      "mean_diff_ad",
+      "ncc_ad",
+      "gray_std",
+      "edge_density"
+    ],
+    "mean": [
+      0.36506484875935297,
+      0.2947894810204132,
+      26.90662929277954,
+      21.084976645078502,
+      0.6645820173046939,
+      29.909161794319726,
+      0.07621779294922568
+    ],
+    "std": [
+      0.3767396751873882,
+      0.3761070263923189,
+      21.345743489799556,
+      22.56121748935336,
+      0.4142750005575894,
+      17.261657491044893,
+      0.04327285206314265
+    ],
+    "intercept": -0.25994731892766004,
+    "coefficients": {
+      "largest_frac_fix": 0.974267814669061,
+      "largest_frac_ad": 2.8429019557663855,
+      "mean_diff_fix": 0.28671184417404083,
+      "mean_diff_ad": -0.6238194882334712,
+      "ncc_ad": -2.745499454326407,
+      "gray_std": 1.3157764999307748,
+      "edge_density": -0.1609609066395818
+    },
+    "threshold": 0.54,
+    "lam": 1.0
+  },
+  "final": "dupla",
+  "criterio_final": "maior F1 agregado na validação cruzada por dia do desenvolvimento (regra da variante dupla x regressão logística; empate favorece a regra)",
+  "f1_validacao_cruzada": {
+    "fixa": 0.9187218117263218,
+    "adaptativa": 0.9757914338919925,
+    "dupla": 0.9871031746031746,
+    "dupla_LR": 0.9801970345307991
+  }
+}
