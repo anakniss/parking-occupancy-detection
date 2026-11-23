@@ -47,14 +47,19 @@ BASELINE = "B_M2"
 
 
 class Dataset:
-    """Quadros por divisão (desenvolvimento/teste), rótulos e referências do dia."""
+    """Quadros por divisão (desenvolvimento/teste), rótulos e referências do dia.
 
-    def __init__(self, experiment: dict):
+    `splits` limita as divisões carregadas: a etapa de desenvolvimento carrega só o
+    desenvolvimento e não lista nem lê nenhum arquivo dos dias de teste.
+    """
+
+    def __init__(self, experiment: dict, splits: list[str] | None = None):
         self.experiment = experiment
         self.root = resolve(experiment["dataset_root"])
         self.reference_paths = {d: resolve(p) for d, p in experiment["references"].items()}
         self.reference_ids = {p.stem for p in self.reference_paths.values()}
-        self.frames = {split: self._list(folders) for split, folders in experiment["splits"].items()}
+        names = splits if splits is not None else list(experiment["splits"])
+        self.frames = {split: self._list(experiment["splits"][split]) for split in names}
         self._labels: dict[str, dict[int, int | None]] = {}
         self._references: dict = {}
 
@@ -163,7 +168,7 @@ def run_sequences(data: Dataset, split: str, specs: dict[str, Spec], compact: bo
 
 def _worker(job: tuple) -> dict[str, list]:
     experiment, split, specs, compact = job
-    return run_sequences(Dataset(experiment), split, specs, compact=compact)
+    return run_sequences(Dataset(experiment, [split]), split, specs, compact=compact)
 
 
 def run_parallel(experiment: dict, split: str, specs: dict[str, Spec], compact: bool, workers: int) -> dict[str, list]:
@@ -171,7 +176,7 @@ def run_parallel(experiment: dict, split: str, specs: dict[str, Spec], compact: 
     names = list(specs)
     workers = max(1, min(workers, len(names)))
     if workers == 1:
-        return run_sequences(Dataset(experiment), split, specs, compact=compact)
+        return run_sequences(Dataset(experiment, [split]), split, specs, compact=compact)
     jobs = [(experiment, split, {n: specs[n] for n in names[i::workers]}, compact) for i in range(workers)]
     out: dict[str, list] = {}
     with ProcessPoolExecutor(workers) as pool:
@@ -773,7 +778,8 @@ def main() -> None:
     args = parser.parse_args()
 
     experiment = load_experiment(args.experiment)
-    data = Dataset(experiment)
+    # desenvolvimento: só os dias de desenvolvimento; teste: os dois (a prevalência do desenvolvimento entra no resumo)
+    data = Dataset(experiment, ["desenvolvimento"] if args.etapa == "desenvolvimento" else None)
     out_dir = resolve(experiment["results_dir"]) / args.etapa
     out_dir.mkdir(parents=True, exist_ok=True)
     if args.etapa == "desenvolvimento":
