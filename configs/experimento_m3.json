@@ -1,0 +1,99 @@
+{
+  "dataset_root": "images/input/UFPR05",
+  "results_dir": "images/results/m3",
+  "dados": {
+    "fonte": {
+      "repo": "Voxel51/PKLot",
+      "revision": "17654327c54c4b6e551606ffa99a8999fea9f42b",
+      "samples_sha256": "f2cef3361cb2698cadb59a920fc3a88504607d5f64c900aa549d24ba0aa6d37f",
+      "lot": "ufpr05"
+    },
+    "versionados": ["Cloudy/2013-04-14", "Sunny/2013-14-16", "Rainy/2013-04-13"],
+    "baixar": [
+      "Sunny/2013-04-14",
+      "Cloudy/2013-04-13",
+      "Cloudy/2013-03-13",
+      "Sunny/2013-03-13",
+      "Rainy/2013-03-13",
+      "Cloudy/2013-03-14",
+      "Rainy/2013-03-19",
+      "Cloudy/2013-03-19",
+      "Sunny/2013-03-21"
+    ]
+  },
+  "references": {
+    "2013-04-13": "images/input/UFPR05/Rainy/2013-04-13/2013-04-13_06_45_01.jpg",
+    "2013-04-14": "images/input/UFPR05/Cloudy/2013-04-14/2013-04-14_06_40_00.jpg",
+    "2013-04-16": "images/input/UFPR05/Sunny/2013-14-16/2013-04-16_06_50_01.jpg",
+    "2013-03-13": "images/input/UFPR05/Cloudy/2013-03-13/2013-03-13_06_25_00.jpg",
+    "2013-03-14": "images/input/UFPR05/Cloudy/2013-03-14/2013-03-14_06_25_00.jpg",
+    "2013-03-19": "images/input/UFPR05/Rainy/2013-03-19/2013-03-19_06_30_00.jpg",
+    "2013-03-21": "images/input/UFPR05/Sunny/2013-03-21/2013-03-21_06_30_00.jpg"
+  },
+  "splits": {
+    "desenvolvimento": [
+      "Cloudy/2013-04-14",
+      "Sunny/2013-04-14",
+      "Sunny/2013-14-16",
+      "Rainy/2013-04-13",
+      "Cloudy/2013-04-13"
+    ],
+    "teste": [
+      "Cloudy/2013-03-13",
+      "Sunny/2013-03-13",
+      "Rainy/2013-03-13",
+      "Cloudy/2013-03-14",
+      "Rainy/2013-03-19",
+      "Cloudy/2013-03-19",
+      "Sunny/2013-03-21"
+    ]
+  },
+  "pipeline": {
+    "description": "Segmentação da configuração B da M2 (mantida sem alteração)",
+    "blur_ksize": 5,
+    "gain_compensation": false,
+    "diff_threshold": 25,
+    "open_ksize": 3,
+    "close_ksize": 7,
+    "min_component_area": 15
+  },
+  "busca": {
+    "tau": {"start": 0.01, "stop": 0.99, "step": 0.01},
+    "alpha": [0.1, 0.25, 0.5, 1.0],
+    "free_max": [0.05, 0.10, 0.15, 0.20]
+  },
+  "variantes": {
+    "fixa": {
+      "descricao": "Só a referência fixa do início do dia (pipeline B da M2), tau reajustado no desenvolvimento",
+      "use_fixed": true,
+      "use_adaptive": false
+    },
+    "adaptativa": {
+      "descricao": "Só a referência adaptativa (média móvel seletiva nas vagas livres)",
+      "use_fixed": false,
+      "use_adaptive": true
+    },
+    "dupla": {
+      "descricao": "Referência fixa + adaptativa; ocupada se diferir das duas (menor fração >= tau)",
+      "use_fixed": true,
+      "use_adaptive": true
+    }
+  },
+  "classificador": {
+    "nome": "dupla_LR",
+    "descricao": "Referências da variante dupla; decisão por regressão logística sobre 7 descritores",
+    "base": "dupla",
+    "features": ["largest_frac_fix", "largest_frac_ad", "mean_diff_fix", "mean_diff_ad", "ncc_ad", "gray_std", "edge_density"],
+    "lam": 1.0
+  },
+  "m2": {
+    "experimento": "configs/experimento_m2.json",
+    "baseline": "B_morfologia",
+    "reavaliar": ["A_sem_morfologia", "C_morfologia_ganho"]
+  },
+  "criterios_sucesso": {
+    "f1_min_por_dia": 0.95,
+    "especificidade_min_chuva": 0.98,
+    "ema_contagem_max": 1.0
+  }
+}

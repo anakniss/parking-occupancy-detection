@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Dados do PKLot baixados por src/get_data.py (não versionados; só a amostra da M2 fica no Git)
+images/input/UFPR05/*/*
+!images/input/UFPR05/Cloudy/2013-04-14/
+!images/input/UFPR05/Sunny/2013-14-16/
+!images/input/UFPR05/Rainy/2013-04-13/
