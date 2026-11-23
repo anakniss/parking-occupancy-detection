@@ -99,6 +99,23 @@ class TestReferenciaAdaptativa(unittest.TestCase):
             SequenceConfig(use_fixed=False, use_adaptive=False)
 
 
+class TestTexturaLBP(unittest.TestCase):
+    def test_codigos_lbp_uniformes(self):
+        from explore_dev import lbp_riu2
+
+        flat = np.full((5, 5), 100, np.uint8)
+        self.assertTrue((lbp_riu2(flat)[1:-1, 1:-1] == 8).all())  # todos os vizinhos >= centro
+        peak = flat.copy()
+        peak[2, 2] = 200
+        self.assertEqual(lbp_riu2(peak)[2, 2], 0)  # centro mais claro que todos os vizinhos
+        edge = flat.copy()
+        edge[:, 3:] = 200  # borda vertical entre as colunas 2 e 3
+        self.assertEqual(lbp_riu2(edge)[2, 2], 8)  # centro 100: todos os vizinhos (100 ou 200) >= centro
+        # centro 200 na coluna 3: vizinhos >= 200 são os 2 da mesma coluna e os 3 da coluna 4 (padrão uniforme)
+        self.assertEqual(lbp_riu2(edge)[2, 3], 5)
+        self.assertEqual(lbp_riu2(flat)[0, 0], 255)  # borda sem código
+
+
 class TestClassificador(unittest.TestCase):
     def test_separa_classes_e_salva_sem_perder_precisao(self):
         rng = np.random.default_rng(1)
