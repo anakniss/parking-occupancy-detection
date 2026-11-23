@@ -580,6 +580,36 @@ def stage_test(experiment: dict, data: Dataset, out_dir: Path, workers: int) -> 
                           "erros_corrigidos": fb["fixed"], "erros_introduzidos": fb["broken"]})
     write_csv(out_dir / "comparacoes.csv", comp_rows)
 
+    # Análise dos falsos negativos do sistema final: qual referência via o veículo e por quanto tempo o erro persiste.
+    final_rows = rows[final_base]
+    tau_final = taus[final_base]
+    fn_idx = [i for i, r in enumerate(final_rows) if r["label"] == 1 and predicted[final][i] == 0]
+    fn_kind = defaultdict(int)
+    for i in fn_idx:
+        r = final_rows[i]
+        sees_fix = r.get("largest_frac_fix", 0.0) >= tau_final
+        sees_ad = r.get("largest_frac_ad", 0.0) >= tau_final
+        fn_kind[("só a fixa vê o veículo (absorvido pela adaptativa)" if sees_fix and not sees_ad else
+                 "só a adaptativa vê o veículo" if sees_ad and not sees_fix else
+                 "nenhuma referência vê o veículo (baixo contraste)")] += 1
+    runs, current = [], {}
+    for i, r in enumerate(final_rows):  # linhas em ordem de dia, quadro e vaga
+        key = (r["date"], r["space_id"])
+        if r["label"] == 1 and predicted[final][i] == 0:
+            run = current.setdefault(key, {"n": 0, "start": r["time"], "date": r["date"], "space": r["space_id"]})
+            run["n"] += 1
+        elif key in current:
+            runs.append(current.pop(key))
+    runs += list(current.values())
+    runs.sort(key=lambda x: -x["n"])
+    persistent = sum(x["n"] for x in runs if x["n"] >= 12)
+    dev_labels = [v for d in data.days("desenvolvimento") for f in data.day_frames("desenvolvimento", d)
+                  for v in data.labels(f).values() if v is not None]
+    prevalence = {"desenvolvimento": float(np.mean(dev_labels)) if dev_labels else None,
+                  "teste": float(np.mean([r["label"] for r in ref_rows]))}
+    write_csv(out_dir / f"falsos_negativos_{final}.csv",
+              [{"dia": x["date"], "vaga": x["space"], "inicio": x["start"], "quadros_seguidos": x["n"]} for x in runs])
+
     # Critérios de sucesso definidos na M2, aplicados ao sistema final.
     crit = experiment["criterios_sucesso"]
     day_metrics = {m["group"].split("dia ")[1]: m for m in metrics[final] if " · dia " in m["group"]}
@@ -708,6 +738,15 @@ def stage_test(experiment: dict, data: Dataset, out_dir: Path, workers: int) -> 
           f"{c['fp_base']} → {c['fp_variante']}", f"{c['fn_base']} → {c['fn_variante']}",
           f"{fmt(c['ema_base'], 2)} → {fmt(c['ema_variante'], 2)}", c["erros_corrigidos"], c["erros_introduzidos"]]
          for c in comp_rows]))
+    md += ["", f"## Falsos negativos do sistema final ({final})", ""]
+    md += [f"Prevalência de vagas ocupadas: teste {fmt(prevalence['teste'])}"
+           + (f"; desenvolvimento {fmt(prevalence['desenvolvimento'])}" if prevalence["desenvolvimento"] else "") + ".", ""]
+    md.append(markdown_table(["Situação do falso negativo (limiar τ da variante)", "Vaga-quadros", "Fração"],
+                             [[k, v, v / max(len(fn_idx), 1)] for k, v in sorted(fn_kind.items(), key=lambda kv: -kv[1])]))
+    md += ["", f"{persistent} de {len(fn_idx)} falsos negativos estão em sequências de 12 ou mais quadros seguidos "
+           "(≥ 1 h) na mesma vaga. Maiores sequências:", ""]
+    md.append(markdown_table(["Dia", "Vaga", "Início", "Quadros seguidos"],
+                             [[x["date"], x["space"], x["start"], x["n"]] for x in runs[:8]]))
     md += ["", f"## Critérios de sucesso (definidos na M2) aplicados ao sistema final ({final})", ""]
     md.append(markdown_table(["Critério", "Grupo", "Valor", "Atendido"], criteria))
     md += ["", "## Casos ilustrados", ""]
