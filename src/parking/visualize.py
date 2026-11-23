@@ -252,3 +252,93 @@ def plot_cases(cases: list[dict], path: Path) -> None:
     fig.tight_layout()
     fig.savefig(path, dpi=130, bbox_inches="tight")
     plt.close(fig)
+
+
+# ---------------------------------------------------------------- figuras da M3
+
+
+def plot_case_grid(cases: list[dict], columns: list[str], path: Path) -> None:
+    """Uma linha por caso; cada caso traz `title` e `crops` (lista na ordem de `columns`)."""
+    style()
+    fig, axes = plt.subplots(len(cases), len(columns), figsize=(2.1 * len(columns), 2.0 * len(cases) + 0.4))
+    axes = np.atleast_2d(axes)
+    for r, case in enumerate(cases):
+        for c, img in enumerate(case["crops"]):
+            ax = axes[r, c]
+            ax.imshow(_rgb(img), cmap="gray" if img.ndim == 2 else None, vmin=0, vmax=255)
+            ax.set_xticks([])
+            ax.set_yticks([])
+            ax.grid(False)
+            for spine in ax.spines.values():
+                spine.set_visible(False)
+            if r == 0:
+                ax.set_title(columns[c], fontsize=9)
+        axes[r, 0].set_ylabel(case["title"], fontsize=8, rotation=0, ha="right", va="center", labelpad=6)
+    fig.tight_layout()
+    fig.savefig(path, dpi=130, bbox_inches="tight")
+    plt.close(fig)
+
+
+def plot_grid_f1(grids: dict[str, dict], path: Path) -> None:
+    """Mapa de F1 no desenvolvimento para cada par (alpha, free_max) da referência adaptativa."""
+    style()
+    fig, axes = plt.subplots(1, len(grids), figsize=(4.6 * len(grids), 3.6))
+    for ax, (name, grid) in zip(np.atleast_1d(axes), grids.items()):
+        values = np.array(grid["f1"])
+        im = ax.imshow(values, cmap="viridis", origin="lower", aspect="auto")
+        ax.set_xticks(range(len(grid["free_max"])), [f"{v:.2f}".replace(".", ",") for v in grid["free_max"]])
+        ax.set_yticks(range(len(grid["alpha"])), [f"{v:.2f}".replace(".", ",") for v in grid["alpha"]])
+        ax.set_xlabel("free_max (folga para atualizar)")
+        ax.set_ylabel("alpha (taxa de atualização)")
+        ax.set_title(f"F1 no desenvolvimento · {name}", loc="left", fontsize=10)
+        ax.grid(False)
+        for i in range(values.shape[0]):
+            for j in range(values.shape[1]):
+                bold = (i, j) == tuple(grid["chosen"])
+                ax.text(j, i, f"{values[i, j]:.3f}".replace(".", ","), ha="center", va="center", fontsize=8,
+                        color="white" if values[i, j] < values.mean() else INK, fontweight="bold" if bold else None)
+        fig.colorbar(im, ax=ax, shrink=0.85)
+    fig.tight_layout()
+    fig.savefig(path, dpi=130)
+    plt.close(fig)
+
+
+def plot_errors_by_hour(series: dict[str, dict], hours: list[int], path: Path, title: str) -> None:
+    """Falsos positivos e falsos negativos por hora do dia, uma coluna por configuração."""
+    style()
+    fig, axes = plt.subplots(1, 2, figsize=(11, 3.4), sharey=False)
+    width = 0.8 / max(len(series), 1)
+    x = np.arange(len(hours))
+    for k, (kind, label) in enumerate([("fp", "Falsos positivos"), ("fn", "Falsos negativos")]):
+        ax = axes[k]
+        for i, (name, values) in enumerate(series.items()):
+            ax.bar(x + (i - (len(series) - 1) / 2) * width, values[kind], width=width, color=SERIES[i % len(SERIES)], label=name)
+        ax.set_xticks(x, [f"{h}h" for h in hours], fontsize=8)
+        ax.set_title(label, loc="left")
+        ax.grid(axis="x", visible=False)
+        ax.set_xlabel("Hora da captura")
+    axes[0].set_ylabel("Vaga-quadros com erro")
+    axes[0].legend(loc="upper left")
+    fig.suptitle(title, x=0.01, ha="left", fontsize=11)
+    fig.tight_layout()
+    fig.savefig(path, dpi=130)
+    plt.close(fig)
+
+
+def plot_coefficients(coefficients: dict[str, float], path: Path) -> None:
+    """Pesos da regressão logística sobre descritores padronizados."""
+    style()
+    names = list(coefficients)
+    values = np.array([coefficients[n] for n in names])
+    order = np.argsort(np.abs(values))
+    fig, ax = plt.subplots(figsize=(7, 0.42 * len(names) + 1.0))
+    colors = [SERIES[1] if v > 0 else SERIES[0] for v in values[order]]
+    ax.barh(np.arange(len(names)), values[order], color=colors)
+    ax.set_yticks(np.arange(len(names)), [names[i] for i in order], fontsize=9)
+    ax.axvline(0, color=AXIS, linewidth=1)
+    ax.set_xlabel("Peso (descritor padronizado); > 0 favorece 'ocupada'")
+    ax.set_title("Regressão logística: contribuição de cada descritor", loc="left")
+    ax.grid(axis="y", visible=False)
+    fig.tight_layout()
+    fig.savefig(path, dpi=130)
+    plt.close(fig)
