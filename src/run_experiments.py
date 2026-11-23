@@ -51,7 +51,11 @@ class Data:
 
     def __init__(self, experiment: dict):
         self.experiment = experiment
-        self.frames = list_frames(resolve(experiment["dataset_root"]))
+        root = resolve(experiment["dataset_root"])
+        # Só as pastas da amostra da M2: as pastas baixadas na M3 ficam no mesmo diretório.
+        folders = experiment.get("folders")
+        self.frames = [f for f in list_frames(root)
+                       if folders is None or f.path.parent.relative_to(root).as_posix() in folders]
         self.reference_paths = {date: resolve(p) for date, p in experiment["references"].items()}
         self.reference_ids = {p.stem for p in self.reference_paths.values()}
         self.labels = {f.id: {s.id: s.occupied for s in load_spaces(f.xml_path)} for f in self.frames}
