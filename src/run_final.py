@@ -654,7 +654,8 @@ def stage_test(experiment: dict, data: Dataset, out_dir: Path, workers: int) -> 
         crops = [crop(s["fixed"], region, box), crop(s["adaptive"], region, box), crop(s["image"], region, box),
                  crop(viz.diff_view(steps["fix"]["diff"]), region, box), crop(steps["fix"]["closed"], region, box),
                  crop(viz.diff_view(steps["ad"]["diff"]), region, box), crop(steps["ad"]["closed"], region, box)]
-        value = f"p = {fmt(float(probabilities[i]), 2)}" if final == clf["nome"] else f"escore {fmt(r['score'], 2)}"
+        value = (f"p = {fmt(float(probabilities[i]), 2)}" if final == clf["nome"]
+                 else f"escore {fmt(rows[final_base][i]['score'], 2)}")  # escore do sistema final, não do baseline
         case_grid.append({"title": f"{kind}\n{r['frame_id']}\nvaga {r['space_id']} · {value}", "crops": crops})
     viz.plot_case_grid(case_grid, ["Ref. fixa", "Ref. adaptativa", "Atual", "Dif. fixa", "Máscara fixa",
                                    "Dif. adaptativa", "Máscara adapt."], out_dir / f"fig_casos_{final}.png")
