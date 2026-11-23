@@ -59,8 +59,9 @@
   },
   "busca": {
     "tau": {"start": 0.01, "stop": 0.99, "step": 0.01},
-    "alpha": [0.1, 0.25, 0.5, 1.0],
-    "free_max": [0.05, 0.10, 0.15, 0.20]
+    "alpha": [0.05, 0.1, 0.25, 0.5],
+    "free_max": [0.10, 0.15, 0.20, 0.25, 0.30],
+    "historico": "A grade inicial (alpha 0,1-1,0; free_max 0,05-0,20) teve o ótimo na borda (free_max = 0,20 na dupla, alpha = 0,1 na adaptativa) e foi ampliada antes de qualquer execução no teste. Resultado da grade inicial: images/results/m3/desenvolvimento/grade_ajuste_inicial.csv"
   },
   "variantes": {
     "fixa": {
