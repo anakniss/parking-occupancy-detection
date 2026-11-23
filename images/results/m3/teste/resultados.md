@@ -146,6 +146,29 @@ EMA contagem = erro médio absoluto do nº de vagas ocupadas por imagem; viés >
 | E1 (reavaliação) | A morfologia (M2) continua útil em dias inéditos? | A_M2 → B_M2 | 0,984 → 0,990 | 207 → 169 | 437 → 259 | 0,97 → 0,66 | 284 | 68 |
 | E2 (reavaliação) | A compensação global de ganho (M2) continua com efeito misto? | B_M2 → C_M2 | 0,990 → 0,987 | 169 → 119 | 259 → 425 | 0,66 → 0,85 | 155 | 271 |
 
+## Falsos negativos do sistema final (dupla)
+
+Prevalência de vagas ocupadas: teste 0,892; desenvolvimento 0,389.
+
+| Situação do falso negativo (limiar τ da variante) | Vaga-quadros | Fração |
+|---|---|---|
+| só a fixa vê o veículo (absorvido pela adaptativa) | 727 | 0,737 |
+| nenhuma referência vê o veículo (baixo contraste) | 253 | 0,257 |
+| só a adaptativa vê o veículo | 6 | 0,006 |
+
+876 de 986 falsos negativos estão em sequências de 12 ou mais quadros seguidos (≥ 1 h) na mesma vaga. Maiores sequências:
+
+| Dia | Vaga | Início | Quadros seguidos |
+|---|---|---|---|
+| 2013-03-14 | 38 | 07:35:01 | 133 |
+| 2013-03-19 | 39 | 07:20:01 | 107 |
+| 2013-03-14 | 28 | 10:20:57 | 98 |
+| 2013-03-13 | 38 | 12:15:07 | 75 |
+| 2013-03-14 | 40 | 12:25:59 | 75 |
+| 2013-03-13 | 40 | 13:20:08 | 62 |
+| 2013-03-14 | 40 | 07:35:01 | 55 |
+| 2013-03-21 | 38 | 08:30:03 | 41 |
+
 ## Critérios de sucesso (definidos na M2) aplicados ao sistema final (dupla)
 
 | Critério | Grupo | Valor | Atendido |
