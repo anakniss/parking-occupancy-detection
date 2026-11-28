@@ -20,7 +20,7 @@ Disciplina de Processamento de Imagens — UNIVALI, 2026-02.
 | Vídeo da M1 | [youtu.be/s6ykhlP6b3k](https://youtu.be/s6ykhlP6b3k) |
 | Vídeo da M2 | *(inserir link do YouTube não listado)* |
 | Vídeo / apresentação da M3 (M3-B) | *(inserir link)* |
-| Slides da M3 (M3-B) | *(inserir link)* |
+| Slides da M3 (M3-B) | [docs/apresentacao_m3_final.pdf](docs/apresentacao_m3_final.pdf) |
 
 # Problema investigado
 
@@ -82,6 +82,7 @@ A identificação automática de vagas disponíveis pode ser aplicada em estacio
 │   ├── experimento_m2.json         # protocolo da M2: referências, ajuste/teste, configurações A/B/C
 │   └── experimento_m3.json         # protocolo da M3: dados, divisão por dia, referências, grade, variantes
 ├── docs/
+│   ├── apresentacao_m3_final.pdf   # slides da apresentação da M3
 │   ├── proposta.md                 # proposta revisada e resposta ao feedback da M1
 │   ├── relatorio_m2.md             # relatório parcial da M2
 │   └── relatorio_m3.md             # relatório final da M3
@@ -173,10 +174,10 @@ python src/run_day.py --dia 2013-04-16 --quadro 07:15 --variante B_M2    # basel
 python -m unittest discover -s tests              # 31 verificações
 python src/make_space_map.py                      # mapa de vagas e máscaras (offline)
 python src/analyze_reference.py                   # X3: dependência da referência vazia (offline)
-python src/summarize_conditions.py                # teste por condição, a partir das decisões congeladas
 python src/get_data.py                            # dias da M3 (~250 MB; exige internet)
 python src/run_final.py --etapa desenvolvimento   # ajuste e congelamento (~5–15 min)
 python src/run_final.py --etapa teste             # teste final (~5–15 min)
+python src/summarize_conditions.py                # teste por condição, a partir das decisões do teste
 python src/explore_dev.py                         # explorações do desenvolvimento
 python src/run_experiments.py                     # experimentos da M2
 ```

@@ -189,7 +189,7 @@ Todo o projeto depende de uma foto do estacionamento vazio tirada pela mesma câ
 4. **A luz e o clima mudam durante o dia.** Uma referência da manhã envelhece. Nas tardes de pouca ocupação do desenvolvimento ela gerou centenas de FP (seção 5.1), e no teste a taxa de falsa vaga livre do `B_M2` na chuva foi 4,5 vezes a do sol (0,045 contra 0,010; seção 7.2). A referência adaptativa corrige parte da deriva, mas cria a absorção de carros (seção 8.1).
 5. **A câmera precisa ficar parada.** Um deslocamento invalida, ao mesmo tempo, a referência e o mapa de vagas. Isso não foi testado: o PKLot tem uma câmera fixa por estacionamento.
 
-**Por que, mesmo assim, mantivemos a referência.** O custo é uma foto por dia, sem c  onjunto de treino. A decisão é interpretável: a máscara mostra onde a vaga mudou. E, cumpridas as condições acima, o `B_M2` atendeu aos três critérios de sucesso em quatro dias inéditos. Os limites 1 a 5 definem onde o sistema **não** deve ser usado sem outra solução.
+**Por que, mesmo assim, mantivemos a referência.** O custo é uma foto por dia, sem conjunto de treino. A decisão é interpretável: a máscara mostra onde a vaga mudou. E, cumpridas as condições acima, o `B_M2` atendeu aos três critérios de sucesso em quatro dias inéditos. Os limites 1 a 5 definem onde o sistema **não** deve ser usado sem outra solução.
 
 ---
 
@@ -632,6 +632,8 @@ Os **727 erros introduzidos** em relação ao baseline são exatamente esses 727
 **Critérios de sucesso.** O sistema final declarado (`dupla`) atendeu ao F1 por dia e à especificidade na chuva, mas **não** ao erro de contagem (1,30 a 2,93 vaga por imagem). O baseline da M2 atendeu aos três nos dias de teste.
 
 **Conclusão.** Respondendo à questão investigada: com uma referência do estacionamento vazio por dia, técnicas clássicas classificaram a ocupação de dias úteis inteiros com F1 de 0,990 e erro médio de 0,66 vaga por imagem em dias inéditos. Isso vale para a configuração B da M2, mantida sem alteração. A tentativa da M3 de tornar a referência adaptativa resolveu o problema que motivou a mudança: os falsos positivos de iluminação, que eram dominantes nas tardes de baixa ocupação do desenvolvimento. Mas ela criou um problema pior para dias lotados, a incorporação de carros parados à referência. A principal lição é de protocolo: o conjunto de desenvolvimento precisa representar o regime de uso (dias úteis, alta ocupação). Validação cruzada sobre três dias atípicos escolheu com confiança a variante errada.
+
+**Recomendação.** Para uso em dias úteis lotados, recomendamos o `B_M2` com a foto do estacionamento vazio do mesmo dia. Como essa escolha vem do próprio teste, ela é uma conclusão a posteriori, a confirmar em dias novos (seção 8.3). A `dupla` só deve ser usada depois de corrigida a absorção de carros (melhoria 1, abaixo). A redução de falsos positivos que ela trouxe fica como hipótese para dias de baixa ocupação, que o teste não cobriu.
 
 **Melhorias futuras** (hipóteses para testar em dias novos, não testadas aqui):
 
