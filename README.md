@@ -1,111 +1,189 @@
 # Parking Occupancy PDI
 
+Identificação de vagas livres e ocupadas em imagens de câmera fixa com técnicas clássicas de Processamento Digital de Imagens.
+Disciplina de Processamento de Imagens — UNIVALI, 2026-02.
+
 ### Integrantes
  * Ana Clara Kniss
  * Gustavo Cezar Marquez
  * Mariana Ferreira
 
-# Problema Investigado
+### Documentação e vídeos
 
-O problema tratado neste projeto foca na identificação automática de vagas livres e ocupadas em estacionamentos a partir de imagens obtidas por câmeras fixas, utilizando técnicas clássicas de Processamento Digital de Imagens.
-Inicialmente, o projeto será delimitado à análise de vagas previamente identificadas nas imagens, permitindo que o foco esteja na identificação de sua ocupação.
+| Material | Link |
+|---|---|
+| **Relatório final da M3** | [docs/relatorio_m3.md](docs/relatorio_m3.md) |
+| Resultados do teste final (gerados pelo código) | [images/results/m3/teste/resultados.md](images/results/m3/teste/resultados.md) · [por condição](images/results/m3/teste/resultados_por_condicao.md) |
+| Dependência da referência vazia (X3) | [images/results/m3/referencia/resultados_referencia.md](images/results/m3/referencia/resultados_referencia.md) |
+| Relatório parcial da M2 | [docs/relatorio_m2.md](docs/relatorio_m2.md) |
+| Proposta (revisada na M2) | [docs/proposta.md](docs/proposta.md) |
+| Vídeo da M1 | [youtu.be/s6ykhlP6b3k](https://youtu.be/s6ykhlP6b3k) |
+| Vídeo da M2 | *(inserir link do YouTube não listado)* |
+| Vídeo / apresentação da M3 (M3-B) | *(inserir link)* |
+| Slides da M3 (M3-B) | [docs/apresentacao_m3_final.pdf](docs/apresentacao_m3_final.pdf) |
+
+# Problema investigado
+
+Dada uma sequência de imagens de um estacionamento capturadas por câmera fixa e o mapa das vagas, decidir se cada vaga está livre ou ocupada em cada quadro e informar o total de vagas livres e ocupadas e a taxa de ocupação. A decisão vem da comparação entre o quadro atual e uma imagem do mesmo estacionamento vazio, tirada pela mesma câmera no início do dia, apesar das variações de iluminação, sombras e clima.
 
 # Contexto de aplicação
 
-A identificação automática de vagas disponíveis pode ser aplicada em estacionamentos de locais com grande fluxo de veículos, como universidades, shopping centers, aeroportos e hospitais.
+A identificação automática de vagas disponíveis pode ser aplicada em estacionamentos de locais com grande fluxo de veículos, como universidades, shopping centers, aeroportos e hospitais. Um sistema que analisa as imagens de câmeras já instaladas pode orientar motoristas e permitir o acompanhamento da ocupação, sem sensores físicos em cada vaga. Técnicas clássicas, mais leves que modelos de IA, podem reduzir o custo de implantação.
 
-Um sistema capaz de analisar imagens de estacionamento e informar o estado de ocupação das vagas poderia auxiliar motoristas na identificação de vagas disponíveis, além de possibilitar o monitoramento da ocupação do estacionamento.
+# Objetivos
 
-A utilização de técnicas clássicas, possivelmente mais leves que técnicas de IA, pode facilitar a implementação de sistemas semelhantes sem um custo tão elevado quanto o de sistemas que utilizam IA.
+**Geral:** desenvolver uma abordagem com técnicas clássicas de PDI para identificar automaticamente a ocupação de vagas a partir de imagens de câmeras fixas.
 
-# Objetivo geral
+**Na M3:**
 
-Desenvolver uma abordagem computacional com técnicas clássicas de Processamento Digital de Imagens para identificar automaticamente a ocupação de vagas de estacionamento a partir de imagens obtidas por câmeras fixas.
+- avaliar o sistema em **dias inéditos** e inteiros (06:25–18:35), com ajuste e teste separados;
+- tratar a deriva de iluminação ao longo do dia (referência adaptativa) e comparar com o baseline da M2;
+- comparar a regra de limiar com um classificador de vários descritores (regressão logística);
+- produzir a ocupação ao longo do dia;
+- documentar dados, código, reprodução e limitações, incluindo o custo de exigir a foto do estacionamento vazio.
 
-# Visão resumida da solução proposta
+# Entradas e saídas
 
-A solução proposta consiste em utilizar técnicas de Processamento Digital de Imagens para analisar imagens de estacionamentos e identificar se suas vagas estão ocupadas ou disponíveis.
+- **Entrada:** quadros JPEG do estacionamento (PKLot/UFPR05, 1280×720), um quadro do estacionamento vazio do mesmo dia e o mapa das 40 vagas (polígonos do XML do PKLot; [mapa](images/results/m3/mapa/mapa_vagas.jpg)).
+- **Saídas:**
+  - imagem com as vagas marcadas (verde = livre, vermelho = ocupada, amarelo = erro, quando há rótulo);
+  - contagem de vagas livres e ocupadas e taxa de ocupação, por quadro e ao longo do dia (CSV e figura);
+  - saídas intermediárias: diferença, máscara limiarizada, abertura, fechamento e componentes rotulados (formato na [seção 4.2 do relatório](docs/relatorio_m3.md#42-mapa-de-vagas-e-formato-das-máscaras));
+  - tabela de descritores por vaga (`vagas.csv`) e resumo (`resumo.json`).
 
-Inicialmente, as vagas presentes nas imagens serão identificadas previamente, para que cada uma possa ser analisada individualmente. Serão testadas diferentes técnicas de processamento para verificar quais conseguem diferenciar uma vaga ocupada de uma vaga vazia.
+![Mapa das 40 vagas](images/results/m3/mapa/mapa_vagas.jpg)
 
-Ao final, o sistema deverá informar o estado de ocupação de cada vaga analisada.
+# Estágio atual
 
-# Conjunto ou origem das imagens
+**M3 — concluída.** O sistema foi avaliado uma única vez, com parâmetros congelados antes, em **4 dias inéditos** (576 quadros, 23 019 vaga-quadros rotulados, com sol, nublado e chuva).
 
-O dataset utilizado é composto por 12.416 imagens de estacionamento, distribuídas entre três conjuntos provinientes de universidades diferentes:
+| Configuração | F1 | Especificidade | Taxa de falsa vaga livre | EMA contagem (vagas/imagem) | Critérios da M2 |
+|---|---:|---:|---:|---:|---|
+| **`B_M2`** — baseline da M2 (referência fixa, congelado) | **0,990** | 0,932 | **0,013** | **0,66** | atende aos três |
+| `dupla` — sistema final declarado da M3 (referência fixa + adaptativa) | 0,974 | **0,977** | 0,048 | 1,74 | não atende ao EMA ≤ 1 |
 
-* PUCPR: 4.474 imagens;
-* UFPR04: 3.791 imagens;
-* UFPR05: 4.152 imagens.
+- **Recomendação para uso real em dias úteis lotados: `B_M2`, com a foto do estacionamento vazio do mesmo dia.** Ela vem do próprio teste, por isso é uma conclusão a posteriori, a confirmar em dias novos ([seção 9](docs/relatorio_m3.md#9-atendimento-aos-objetivos-conclusão-e-melhorias-futuras)). A `dupla` não é recomendada para esses dias enquanto a absorção de carros pela referência adaptativa não for corrigida. O ganho dela nos falsos positivos fica como hipótese para dias de baixa ocupação, que o teste não cobriu.
+- **O sistema da M3 perdeu para o baseline.** A referência adaptativa reduziu as falsas vagas ocupadas (FP 169 → 58), mas incorporou carros parados ao fundo nos dias úteis lotados (FN 259 → 986). A causa está analisada na [seção 8 do relatório](docs/relatorio_m3.md#8-análise-de-erros-limitações-e-ameaças-à-validade).
+- **A compensação global de ganho** (experimento recomendado no parecer da M2) não teve saldo positivo nem no sol nem na chuva ([seção 7.3.1](docs/relatorio_m3.md#731-experimento-recomendado-no-parecer-diferença-simples--diferença-com-compensação-de-ganho-sob-chuva-e-sol)).
+- **A foto do estacionamento vazio do mesmo dia deu o melhor resultado.** Com a de outro dia (3 dias avaliados), o EMA do baseline vai de 0,02–0,38 para 0,38–3,94, e a piora costuma ser maior quando o clima da referência difere do quadro avaliado ([seção 3.4](docs/relatorio_m3.md#34-referência-do-estacionamento-vazio-condições-justificativa-custo-e-limites)).
 
-O dataset é público e foi encontrado a partir do seguinte artigo:
+**Fora do escopo:** localização automática das vagas, outras câmeras ou estacionamentos e período noturno.
 
-Almeida, P., Oliveira, L. S., Silva Jr, E., Britto Jr, A., Koerich, A., PKLot – A robust dataset for parking lot classification, Expert Systems with Applications, 42(11):4937-4949, 2015.
+# Tecnologias
 
-## Acesso ao dataset para reprodução
-
-O conjunto completo do PKLot não é versionado neste repositório. Para obtê-lo, use a versão pública disponibilizada no [Hugging Face](https://huggingface.co/datasets/Voxel51/PKLot). O repositório contém uma amostra em `images/input/`; ela pode ser usada para conferir a estrutura local sem baixar o conjunto completo.
-
-Uma forma de baixar e carregar os dados e suas anotações é usar o FiftyOne:
-
-```bash
-python -m pip install -U fiftyone "huggingface-hub>=0.20.0"
-```
-
-Em seguida, execute este código Python na máquina em que os experimentos serão reproduzidos:
-
-```python
-import fiftyone as fo
-from fiftyone.utils.huggingface import load_from_hub
-
-# Load the dataset
-# Note: other available arguments include 'max_samples', etc
-dataset = load_from_hub("Voxel51/PKLot")
-
-# Launch the App
-session = fo.launch_app(dataset)
-session.wait()
-```
-
-O comando instala o FiftyOne. O código carrega o dataset PKLot pela plataforma Hugging Face e abre o FiftyOne App, onde é possível explorar as imagens e suas anotações. O objeto `dataset` também fica disponível no Python para uso nos experimentos. Consulte a página do dataset para obter detalhes sobre os campos e as anotações.
-
-# Estágio atual do projeto
-
-O projeto está em evolução para a etapa M2, com foco em uma implementação parcial executável e em validação experimental de técnicas clássicas de processamento de imagens para ocupação de vagas.
-
-# Resposta ao feedback da M1 e evolução para a M2
-
-A proposta original foi mantida em sua ideia central: analisar vagas conhecidas em câmeras fixas por comparação entre uma imagem atual e uma imagem de referência. Os principais ajustes foram:
-
-1. Escopo focado: a etapa de detecção automática de vagas foi retirada da prioridade da M2. Em vez disso, a análise será aplicada sobre regiões previamente conhecidas, usando coordenadas ou metadados do conjunto de dados. Essa decisão reduz ambiguidades e permite avaliar a classificação da ocupação com maior controle experimental.
-2. Reprodutibilidade e controle de dados: o conjunto completo do PKLot não será versionado no repositório. A proposta passa a manter uma amostra representativa e instruções de acesso ao dataset para reprodução.
-3. Avaliação comparativa: o projeto agora prevê pelo menos duas configurações controladas, com variação explícita de parâmetros ou de técnica (por exemplo, diferença absoluta com e sem morfologia, ou limiar global e limiar adaptativo), de modo a medir quantitativamente a qualidade da resposta.
-
-Essas mudanças estão alinhadas aos pontos levantados no feedback da M1, especialmente no que diz respeito a escopo, documentação e reprodução do experimento.
+- Python 3 (testado com 3.14.8 e 3.14.10)
+- OpenCV 5.0, NumPy 2.5, Matplotlib 3.11 (versões em [`requirements.txt`](requirements.txt))
+- Git / GitHub
 
 # Organização do repositório
 
-O repositório está organizado da seguinte forma:
+```
+├── configs/
+│   ├── experimento_m2.json         # protocolo da M2: referências, ajuste/teste, configurações A/B/C
+│   └── experimento_m3.json         # protocolo da M3: dados, divisão por dia, referências, grade, variantes
+├── docs/
+│   ├── apresentacao_m3_final.pdf   # slides da apresentação da M3
+│   ├── proposta.md                 # proposta revisada e resposta ao feedback da M1
+│   ├── relatorio_m2.md             # relatório parcial da M2
+│   └── relatorio_m3.md             # relatório final da M3
+├── images/
+│   ├── input/UFPR05/               # amostra do PKLot (140 imagens + XML); dias da M3 baixados por get_data.py
+│   └── results/
+│       ├── exemplo/                # saídas intermediárias de run_pipeline.py
+│       ├── experimentos/           # resultados da M2 (run_experiments.py)
+│       └── m3/
+│           ├── desenvolvimento/    # grade, validação cruzada (run_final.py --etapa desenvolvimento)
+│           ├── teste/              # teste final, por dia e por condição (run_final.py, summarize_conditions.py)
+│           ├── exploracao/         # ideias descartadas no desenvolvimento (explore_dev.py)
+│           ├── referencia/         # X3: dependência da referência vazia (analyze_reference.py)
+│           ├── mapa/               # mapa de vagas e formato das máscaras (make_space_map.py)
+│           └── dia/                # ocupação ao longo de um dia (run_day.py)
+├── models/sistema_final_m3.json    # parâmetros congelados antes do teste
+├── src/
+│   ├── parking/                    # pacote: dataset, pipeline, sequence, classifier, metrics, visualize
+│   ├── run_pipeline.py             # pipeline em uma imagem
+│   ├── run_day.py                  # sistema final (ou baseline) em um dia inteiro
+│   ├── run_final.py                # avaliação da M3: desenvolvimento e teste
+│   ├── get_data.py                 # baixa os dias da M3 (Hugging Face, revisão fixada)
+│   ├── explore_dev.py              # explorações do desenvolvimento
+│   ├── analyze_reference.py        # X3: sensibilidade à referência vazia
+│   ├── summarize_conditions.py     # indicadores do teste por condição climática
+│   ├── make_space_map.py           # mapa de vagas e máscaras
+│   └── run_experiments.py          # experimentos da M2
+├── tests/                          # 31 verificações automáticas
+└── requirements.txt
+```
 
-- `README.md`: apresentação geral do projeto e informações para navegação no repositório.
-- `docs/`: documentação detalhada do projeto, incluindo a proposta técnica.
-- `images/`: dataset de imagens utilizadas nos experimentos e resultados obtidos.
-- `src/`: códigos-fonte desenvolvidos para o processamento das imagens.
+# Dados
 
-# Tecnologias previstas ou já utilizadas
+- **Origem:** PKLot (Almeida et al., 2015), estacionamento UFPR05, câmera fixa. Licença **CC BY 4.0**, que permite redistribuição com atribuição.
+- **Amostra versionada (M2):** 140 imagens (37 MB) com XML em [`images/input/UFPR05/`](images/input/UFPR05/), de três manhãs. Ela permite rodar o exemplo, o mapa, a análise X3 e os testes **sem internet**. A pasta do dia de sol está nomeada `2013-14-16`; o código lê a data do nome do arquivo.
+- **Dias da M3 (não versionados):** 767 imagens obtidas por `python src/get_data.py` da versão do PKLot no [Hugging Face](https://huggingface.co/datasets/Voxel51/PKLot). O script usa uma revisão fixada, confere o SHA-256 das anotações e reconstrói os XMLs. A conversão reproduz exatamente os 140 XMLs originais da amostra.
+- **Divisão por dia:**
 
-- Python
-- OpenCV
-- Git / Github
+  | Conjunto | Dias | Quadros | Vagas ocupadas |
+  |---|---|---:|---:|
+  | Desenvolvimento | 13/04 (sáb.), 14/04 (dom.), 16/04 (ter.; só manhã) | 324 | 38,9% |
+  | Teste | 13/03, 14/03, 19/03, 21/03 (dias úteis inteiros) | 576 | 89,2% |
 
-# Instruções para reproduzir experimentos existentes, quando houver
+- **Referência:** o primeiro quadro do dia com as 40 vagas livres. As condições e os limites estão na [seção 3.4 do relatório](docs/relatorio_m3.md#34-referência-do-estacionamento-vazio-condições-justificativa-custo-e-limites).
+- **Listas exatas:** [`manifesto_imagens.csv`](images/results/m3/teste/manifesto_imagens.csv).
 
-Não tem...
+# Instalação
 
-# Link para o vídeo da M1
+Na raiz do repositório:
 
-[https://youtube.com ...](https://youtu.be/s6ykhlP6b3k)
+```bash
+python -m venv .venv
+# Windows (PowerShell):  .venv\Scripts\Activate.ps1
+# Linux/macOS:           source .venv/bin/activate
+pip install -r requirements.txt
+```
 
-# Link para documentação adicional existente no próprio repositório
+# Execução
 
-[proposta](docs/proposta.md)
+### Exemplo mínimo (offline)
+
+```bash
+python src/run_pipeline.py --image images/input/UFPR05/Cloudy/2013-04-14/2013-04-14_10_00_04.jpg
+```
+
+Saída esperada:
+
+```
+Imagem: 2013-04-14_10_00_04 (Cloudy, 2013-04-14 10:00:04)
+Referência: 2013-04-14_06_40_00
+Configuração: B_morfologia (T = 25, tau = 0.24, abertura = 3, fechamento = 7, ganho = False)
+Vagas analisadas: 40 | Ocupadas: 12 | Livres: 28 | Ocupação: 30.0%
+Rótulos do XML: 12 ocupadas | acertos: 40/40
+Saídas em: images/results/exemplo/2013-04-14_10_00_04
+```
+
+Ficam em `images/results/exemplo/2013-04-14_10_00_04/` as etapas `01_entrada` … `09_saida`, o `painel.jpg`, o `vagas.csv` e o `resumo.json`. Opções: `--config A_sem_morfologia | B_morfologia | C_morfologia_ganho`, `--reference <jpg>` e `--out <pasta>`.
+
+### Um dia inteiro (offline, dia 2013-04-16 da amostra)
+
+```bash
+python src/run_day.py --dia 2013-04-16 --quadro 07:15                    # sistema final: 2061/2079 acertos
+python src/run_day.py --dia 2013-04-16 --quadro 07:15 --variante B_M2    # baseline:      2064/2079 acertos
+```
+
+### Reprodução completa
+
+```bash
+python -m unittest discover -s tests              # 31 verificações
+python src/make_space_map.py                      # mapa de vagas e máscaras (offline)
+python src/analyze_reference.py                   # X3: dependência da referência vazia (offline)
+python src/get_data.py                            # dias da M3 (~250 MB; exige internet)
+python src/run_final.py --etapa desenvolvimento   # ajuste e congelamento (~5–15 min)
+python src/run_final.py --etapa teste             # teste final (~5–15 min)
+python src/summarize_conditions.py                # teste por condição, a partir das decisões do teste
+python src/explore_dev.py                         # explorações do desenvolvimento
+python src/run_experiments.py                     # experimentos da M2
+```
+
+Os resultados são determinísticos. A lista completa, com os tempos e o que cada comando regrava, está na [seção 12 do relatório](docs/relatorio_m3.md#12-referências-e-reprodução).
+
+# Resultados da M2 (histórico)
+
+Nas manhãs da M2, a configuração B obteve F1 = 0,992 e EMA = 0,30. A M3 reavaliou A, B e C em dias inéditos, e as conclusões de E1 (a morfologia ajuda) e de E2 (o ganho global não compensa) se mantiveram. Os detalhes estão no [relatório da M2](docs/relatorio_m2.md#6-experimentos-resultados-e-análise).

@@ -1,0 +1,7 @@
+id,pergunta,base,variante,f1_base,f1_variante,fp_base,fp_variante,fn_base,fn_variante,ema_base,ema_variante,erros_corrigidos,erros_introduzidos
+Baseline x final,O sistema final da M3 supera o baseline da M2 em dias inéditos?,B_M2,dupla,0.9896,0.974,169,58,259,986,0.6562,1.7396,111,727
+E3,A referência adaptativa reduz os erros da deriva de iluminação ao longo do dia?,fixa,adaptativa,0.9693,0.9761,66,80,1160,884,2.0382,1.5347,546,284
+E4,Manter a referência fixa ao lado da adaptativa evita os travamentos da adaptativa?,adaptativa,dupla,0.9761,0.974,80,58,884,986,1.5347,1.7396,116,196
+E5,A regressão logística sobre vários descritores supera a regra de limiar único?,dupla,dupla_LR,0.974,0.9728,58,105,986,986,1.7396,1.7101,52,99
+E1 (reavaliação),A morfologia (M2) continua útil em dias inéditos?,A_M2,B_M2,0.9842,0.9896,207,169,437,259,0.9688,0.6562,284,68
+E2 (reavaliação),A compensação global de ganho (M2) continua com efeito misto?,B_M2,C_M2,0.9896,0.9867,169,119,259,425,0.6562,0.8507,155,271
