@@ -176,8 +176,8 @@ Todo o projeto depende de uma foto do estacionamento vazio tirada pela mesma câ
 | 14/04, nublado | EMA 0,02 · FP 0 · FN 1 | EMA 0,06 · FP 2 · FN 1 (08:10) | EMA 0,78 a 3,94 · FP 43 a 225 |
 | 16/04, sol | EMA 0,25 · FP 7 · FN 8 | não existe (só um quadro vazio) | EMA 0,38 a 1,79 · FP 15 a 87 |
 
-- **Uma foto única para todos os dias não funciona.** Com a referência de outro dia, o EMA sempre piora: de 1,5 vez (16/04 com a referência nublada, 0,38 contra 0,25) a mais de 200 vezes (14/04 com a referência da chuva, 3,94 contra 0,02). O erro é quase todo de falsas vagas ocupadas: o asfalto de outro dia "parece" um carro.
-- **O pior caso é um clima diferente do da referência.** A referência do dia de chuva aplicada ao dia de sol leva a especificidade a 0,734: 27% das vagas livres aparecem como ocupadas.
+- **Nos três dias avaliados, uma foto única para todos os dias não funciona.** Com a referência de outro dia, o EMA sempre piora: de 1,5 vez (16/04 com a referência nublada, 0,38 contra 0,25) a cerca de 200 vezes (14/04 com a referência da chuva, 3,94 contra 0,02). O erro é quase todo de falsas vagas ocupadas: o asfalto de outro dia "parece" um carro.
+- **A piora costuma ser maior quando o clima da referência difere do dia avaliado.** A referência do dia de chuva aplicada ao dia de sol leva a especificidade a 0,734: 27% das vagas livres aparecem como ocupadas.
 - **Uma referência mais próxima no tempo ajuda.** Na chuva, trocar a referência das 06:45 pela das 08:25 eliminou os 8 FP. Esse é o efeito de deriva que motivou a referência adaptativa (seção 5.2).
 - O F1 de 13/04 é baixo (0,70 a 0,90) porque o dia tem só 16 vaga-quadros ocupados na amostra. Nesse dia, o EMA e a especificidade são os indicadores informativos.
 
@@ -189,7 +189,7 @@ Todo o projeto depende de uma foto do estacionamento vazio tirada pela mesma câ
 4. **A luz e o clima mudam durante o dia.** Uma referência da manhã envelhece. Nas tardes de pouca ocupação do desenvolvimento ela gerou centenas de FP (seção 5.1), e no teste a taxa de falsa vaga livre do `B_M2` na chuva foi 4,5 vezes a do sol (0,045 contra 0,010; seção 7.2). A referência adaptativa corrige parte da deriva, mas cria a absorção de carros (seção 8.1).
 5. **A câmera precisa ficar parada.** Um deslocamento invalida, ao mesmo tempo, a referência e o mapa de vagas. Isso não foi testado: o PKLot tem uma câmera fixa por estacionamento.
 
-**Por que, mesmo assim, mantivemos a referência.** O custo é uma foto por dia, sem conjunto de treino. A decisão é interpretável: a máscara mostra onde a vaga mudou. E, cumpridas as condições acima, o `B_M2` atendeu aos três critérios de sucesso em quatro dias inéditos. Os limites 1 a 5 definem onde o sistema **não** deve ser usado sem outra solução.
+**Por que, mesmo assim, mantivemos a referência.** O custo é uma foto por dia, sem c  onjunto de treino. A decisão é interpretável: a máscara mostra onde a vaga mudou. E, cumpridas as condições acima, o `B_M2` atendeu aos três critérios de sucesso em quatro dias inéditos. Os limites 1 a 5 definem onde o sistema **não** deve ser usado sem outra solução.
 
 ---
 

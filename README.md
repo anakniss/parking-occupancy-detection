@@ -62,9 +62,10 @@ A identificação automática de vagas disponíveis pode ser aplicada em estacio
 | **`B_M2`** — baseline da M2 (referência fixa, congelado) | **0,990** | 0,932 | **0,013** | **0,66** | atende aos três |
 | `dupla` — sistema final declarado da M3 (referência fixa + adaptativa) | 0,974 | **0,977** | 0,048 | 1,74 | não atende ao EMA ≤ 1 |
 
+- **Recomendação para uso real em dias úteis lotados: `B_M2`, com a foto do estacionamento vazio do mesmo dia.** Ela vem do próprio teste, por isso é uma conclusão a posteriori, a confirmar em dias novos ([seção 9](docs/relatorio_m3.md#9-atendimento-aos-objetivos-conclusão-e-melhorias-futuras)). A `dupla` não é recomendada para esses dias enquanto a absorção de carros pela referência adaptativa não for corrigida. O ganho dela nos falsos positivos fica como hipótese para dias de baixa ocupação, que o teste não cobriu.
 - **O sistema da M3 perdeu para o baseline.** A referência adaptativa reduziu as falsas vagas ocupadas (FP 169 → 58), mas incorporou carros parados ao fundo nos dias úteis lotados (FN 259 → 986). A causa está analisada na [seção 8 do relatório](docs/relatorio_m3.md#8-análise-de-erros-limitações-e-ameaças-à-validade).
 - **A compensação global de ganho** (experimento recomendado no parecer da M2) não teve saldo positivo nem no sol nem na chuva ([seção 7.3.1](docs/relatorio_m3.md#731-experimento-recomendado-no-parecer-diferença-simples--diferença-com-compensação-de-ganho-sob-chuva-e-sol)).
-- **A foto do estacionamento vazio precisa ser do mesmo dia.** Com a de outro dia, o EMA do baseline vai de 0,02–0,38 para 0,38–3,94 ([seção 3.4](docs/relatorio_m3.md#34-referência-do-estacionamento-vazio-condições-justificativa-custo-e-limites)).
+- **A foto do estacionamento vazio do mesmo dia deu o melhor resultado.** Com a de outro dia (3 dias avaliados), o EMA do baseline vai de 0,02–0,38 para 0,38–3,94, e a piora costuma ser maior quando o clima da referência difere do quadro avaliado ([seção 3.4](docs/relatorio_m3.md#34-referência-do-estacionamento-vazio-condições-justificativa-custo-e-limites)).
 
 **Fora do escopo:** localização automática das vagas, outras câmeras ou estacionamentos e período noturno.
 
