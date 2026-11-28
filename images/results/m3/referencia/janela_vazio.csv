@@ -1,0 +1,4 @@
+date,condition,frames_in_sample,empty_frames,first_empty,last_empty
+2013-04-13,chuva,31,21,06:45:01,08:25:02
+2013-04-14,nublado,56,19,06:40:00,08:10:02
+2013-04-16,sol,53,1,06:50:01,06:50:01
