@@ -525,7 +525,7 @@ A explicação da M2 é compatível com isso. A mediana do quadro inteiro depend
 
 ![Contagem de vagas ocupadas por horário nos dias de teste](../images/results/m3/teste/fig_contagem_teste.png)
 
-**Figura 7.** Vagas ocupadas por quadro: rótulo (preto), baseline (azul) e sistema final (laranja). Os dois sistemas acompanham o enchimento das 06:50–07:40. A partir daí, o final fica sistematicamente abaixo do rótulo. Em 14/03 ele fica pelo menos 2 vagas abaixo desde 07:40 até o fim do dia: são carros absorvidos durante o enchimento (vagas 38 e 40, tabela 8.1). O baseline oscila mais no fim da tarde de 21/03 (sol baixo; até +7 vagas às 17:30).
+**Figura 7.** Vagas ocupadas por quadro: rótulo (preto), baseline (azul) e sistema final (laranja). Os dois sistemas acompanham o enchimento das 06:50–07:40. A partir daí, o final fica sistematicamente abaixo do rótulo. Em 14/03, a partir das 07:35, ele fica 2 ou mais vagas abaixo do rótulo em 130 dos 133 quadros (nos outros 3, 1 vaga abaixo): são carros absorvidos durante o enchimento (vagas 38 e 40, tabela 8.1). O baseline oscila mais no fim da tarde de 21/03 (sol baixo; até +7 vagas às 17:30).
 
 ![Erros por hora](../images/results/m3/teste/fig_erros_por_hora.png)
 
@@ -718,7 +718,6 @@ O número de commits não mede a participação. Revisões, discussões e trabal
 **Declaração de uso de IA generativa (M3):**
 
 - **Ferramenta:** Claude Code (Anthropic), modelo Claude Opus 5.5, entre 23/11/2026 e a data deste relatório, a pedido de Ana Clara Kniss.
-- **Link da conversa:** não disponível. As sessões rodaram localmente no Claude Code (extensão do VS Code), sem link público de compartilhamento. *(Se houver um link exportado, substituir esta linha.)*
 - **Finalidade:**
   - executar os experimentos;
   - analisar os erros;
